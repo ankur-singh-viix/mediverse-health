@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ---------------------------------------------------------------- */
+    /* MediVerse AI - Light Theme                                       */
+    /* A clean, clinical, trustworthy palette anchored on medical teal.  */
+    /* ---------------------------------------------------------------- */
+    --background: 210 40% 98%;
+    --foreground: 215 28% 17%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 28% 17%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 28% 17%;
+
+    --primary: 187 72% 32%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 199 89% 96%;
+    --secondary-foreground: 187 72% 22%;
+
+    --muted: 210 40% 94%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 174 62% 90%;
+    --accent-foreground: 187 72% 22%;
+
+    --success: 152 60% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 89%;
+    --input: 214 32% 89%;
+    --ring: 187 72% 32%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* ---------------------------------------------------------------- */
+    /* MediVerse AI - Dark Theme                                        */
+    /* ---------------------------------------------------------------- */
+    --background: 222 30% 8%;
+    --foreground: 210 40% 96%;
+
+    --card: 222 27% 11%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 222 27% 11%;
+    --popover-foreground: 210 40% 96%;
+
+    --primary: 187 65% 45%;
+    --primary-foreground: 222 30% 8%;
+
+    --secondary: 217 24% 17%;
+    --secondary-foreground: 210 40% 96%;
+
+    --muted: 217 24% 17%;
+    --muted-foreground: 215 16% 65%;
+
+    --accent: 187 40% 20%;
+    --accent-foreground: 187 65% 85%;
+
+    --success: 152 55% 45%;
+    --success-foreground: 222 30% 8%;
+
+    --destructive: 0 63% 50%;
+    --destructive-foreground: 210 40% 96%;
+
+    --border: 217 24% 20%;
+    --input: 217 24% 20%;
+    --ring: 187 65% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  ::selection {
+    @apply bg-primary/20;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+}
