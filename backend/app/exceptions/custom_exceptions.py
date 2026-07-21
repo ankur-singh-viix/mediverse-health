@@ -51,3 +51,21 @@ class ConflictException(AppException):
 
     status_code = 409
     error = "conflict"
+
+
+class InvalidCredentialsException(UnauthorizedException):
+    """Raised when login credentials are incorrect."""
+
+    error = "invalid_credentials"
+
+    def __init__(self, detail: str | None = None) -> None:
+        super().__init__(detail or "Incorrect email or password.")
+
+
+class UserAlreadyExistsException(ConflictException):
+    """Raised when attempting to register an email that is already in use."""
+
+    error = "user_already_exists"
+
+    def __init__(self, detail: str | None = None) -> None:
+        super().__init__(detail or "An account with this email already exists.")

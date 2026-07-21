@@ -1,24 +1,64 @@
 """
-Authentication dependencies (structure only).
+Authentication & authorization dependencies.
 
-These FastAPI dependencies define the shape of future auth guards
-(e.g. `get_current_user`, `require_role`). They are not wired into any
-route yet - that will happen once the authentication module is
-implemented in a later phase.
+FastAPI dependencies that extract and validate the current user from
+a bearer token, and enforce role-based access control on protected
+routes.
 """
 
+import uuid
+
 from fastapi import Depends
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
+from app.auth.jwt_handler import JWTHandler, TokenType
 from app.db.session import get_db
+from app.exceptions.custom_exceptions import UnauthorizedException, ForbiddenException
+from app.models.user import User, UserRole
+from app.repositories.user_repository import UserRepository
+
+bearer_scheme = HTTPBearer(auto_error=False)
 
 
-def get_current_user_placeholder(db: Session = Depends(get_db)) -> None:
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    db: Session = Depends(get_db),
+) -> User:
     """
-    Reserved dependency slot for extracting the authenticated user from
-    a bearer token. Intentionally unimplemented in Phase 0.
+    Resolve the authenticated user from the `Authorization: Bearer <token>`
+    header. Raises `UnauthorizedException` if the token is missing,
+    invalid, expired, or the user no longer exists/is inactive.
     """
-    raise NotImplementedError(
-        "Authentication is not implemented in Phase 0. "
-        "This dependency is reserved for a future phase."
-    )
+    if credentials is None:
+        raise UnauthorizedException("Missing authentication credentials.")
+
+    payload = JWTHandler.decode_token(credentials.credentials, expected_type=TokenType.ACCESS)
+
+    try:
+        user_id = uuid.UUID(payload["sub"])
+    except (KeyError, ValueError) as exc:
+        raise UnauthorizedException("Invalid token subject.") from exc
+
+    user = UserRepository(db).get_by_id(user_id)
+
+    if user is None or not user.is_active:
+        raise UnauthorizedException("Account not found or inactive.")
+
+    return user
+
+
+def require_role(*allowed_roles: UserRole):
+    """
+    Dependency factory that restricts a route to specific user roles.
+
+    Usage:
+        @router.get("/doctor-only", dependencies=[Depends(require_role(UserRole.DOCTOR))])
+    """
+
+    def _dependency(current_user: User = Depends(get_current_user)) -> User:
+        if current_user.role not in allowed_roles:
+            raise ForbiddenException("You do not have permission to access this resource.")
+        return current_user
+
+    return _dependency

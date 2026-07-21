@@ -1,13 +1,17 @@
+import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { LoadingSpinner } from "@/components/common/loading-spinner";
+import { getApiErrorMessage } from "@/lib/api-error";
 import { ROUTES } from "@/constants/routes";
+import { useAuth } from "@/providers/auth-provider";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Enter a valid email address"),
@@ -17,6 +21,10 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [formError, setFormError] = React.useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -25,9 +33,16 @@ export function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (_values: LoginFormValues) => {
-    // Authentication is not implemented in Phase 0.
-    // This handler is a structural placeholder for a future phase.
+  const onSubmit = async (values: LoginFormValues) => {
+    setFormError(null);
+    try {
+      const user = await login(values);
+      const destination =
+        user.role === "doctor" ? ROUTES.DOCTOR_DASHBOARD : ROUTES.PATIENT_DASHBOARD;
+      navigate(destination, { replace: true });
+    } catch (error) {
+      setFormError(getApiErrorMessage(error, "Unable to log in. Please try again."));
+    }
   };
 
   return (
@@ -38,6 +53,12 @@ export function LoginPage() {
       </CardHeader>
       <CardContent className="px-0">
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
+          {formError && (
+            <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {formError}
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -67,7 +88,7 @@ export function LoginPage() {
           </div>
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            Log in
+            {isSubmitting ? <LoadingSpinner size={16} className="text-primary-foreground" /> : "Log in"}
           </Button>
         </form>
 

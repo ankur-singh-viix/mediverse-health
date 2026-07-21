@@ -1,8 +1,7 @@
 """
 Authentication & authorization module.
 
-Phase 0 note: This module defines the STRUCTURE for JWT-based
-authentication only. Password hashing, token issuance/verification,
-login/register flows are intentionally NOT implemented yet and will be
-built in a future phase.
+Implements JWT-based authentication: token issuance/validation
+(`jwt_handler`) and FastAPI dependencies for extracting the current
+user and enforcing role-based access control (`dependencies`).
 """
