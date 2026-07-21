@@ -3,11 +3,12 @@
 **A Role-Based AI Healthcare Platform** — connecting Patients and Doctors on a
 single, secure, and scalable platform.
 
-> **Status: Phase 0 — Foundation Architecture**
-> This repository currently contains only the production-grade project
-> scaffolding. No business features, AI modules, dashboards, or
-> authentication logic have been implemented yet. This phase exists solely
-> to establish a clean, scalable foundation for all future phases.
+> **Status: Phase 1 — Authentication & Authorization**
+> Phase 0 established the production-grade foundation. Phase 1 adds real
+> JWT-based authentication: registration, login, session restore, and
+> role-based route protection for Patients and Doctors. Dashboards, AI
+> modules, appointments, and other business features are still not
+> implemented — that's the scope of future phases.
 
 ---
 
@@ -28,7 +29,7 @@ single, secure, and scalable platform.
 - SQLAlchemy + Alembic
 - PostgreSQL
 - Pydantic / Pydantic Settings
-- JWT structure (Passlib + python-jose) — **not yet implemented**
+- JWT Authentication — access/refresh tokens, RBAC (Patient / Doctor)
 
 ### Infrastructure
 - Docker + Docker Compose
@@ -200,12 +201,21 @@ alembic upgrade head
 - [ ] `cd backend && pip install -r requirements.txt` completes with no errors
 - [ ] `uvicorn app.main:app --reload` starts without errors
 - [ ] `GET http://localhost:8000/api/v1/health` returns `{"status": "ok", ...}`
-- [ ] `GET http://localhost:8000/docs` renders the Swagger UI
+- [ ] `GET http://localhost:8000/docs` renders the Swagger UI, including `/auth/*` routes
+- [ ] `alembic upgrade head` creates the `users` table
+- [ ] `POST /api/v1/auth/register` creates a user and returns an access/refresh token pair
+- [ ] `POST /api/v1/auth/login` with correct credentials returns tokens; incorrect password returns `401`
+- [ ] `GET /api/v1/auth/me` with a valid bearer token returns the user profile; without a token returns `401`
+- [ ] Registering the same email twice returns `409 user_already_exists`
 - [ ] `cd frontend && npm install` completes with no errors
 - [ ] `npm run dev` starts the Vite dev server without errors
 - [ ] `npm run build` completes successfully and produces `frontend/dist`
 - [ ] Landing page renders at `http://localhost:5173`
-- [ ] `/login` and `/register` pages render with working client-side validation
+- [ ] Registering via `/register` logs you in and redirects to the correct role dashboard
+- [ ] Logging in via `/login` with valid/invalid credentials behaves correctly, with errors shown in the form
+- [ ] Refreshing the page keeps you logged in (session restored via `/auth/me`)
+- [ ] Logging out (navbar button) clears the session and returns you to the landing page
+- [ ] Visiting a dashboard route while logged out redirects to `/login`
 - [ ] Navigating to an unknown route renders the 404 page
 - [ ] Dark/light theme toggle switches the UI theme
 - [ ] `docker compose up --build` starts all three services successfully
@@ -214,20 +224,19 @@ alembic upgrade head
 
 ## What This Phase Intentionally Does NOT Include
 
-Per the Phase 0 scope, the following are **not implemented** — only the
-architecture is prepared to support them in future phases:
+The following remain **not implemented** — only the architecture is prepared
+to support them in future phases:
 
-- Authentication logic (login, registration, token issuance/validation)
-- AI features or predictions
 - Dashboards with real data
 - Appointments, chat, report uploads, medical timeline
-- Disease prediction models
+- AI features, predictions, or disease prediction models
+- Email verification, password reset, refresh-token rotation on the client
 
 ---
 
 ## Roadmap (Future Phases)
 
-1. **Phase 1** — Authentication & Authorization (JWT, password hashing, RBAC)
+1. ~~**Phase 1** — Authentication & Authorization (JWT, password hashing, RBAC)~~ ✅ Done
 2. **Phase 2** — Patient module (profile, medical records, timeline)
 3. **Phase 3** — Doctor module (patient management, consultations)
 4. **Phase 4** — AI modules (predictions, chat, insights)
