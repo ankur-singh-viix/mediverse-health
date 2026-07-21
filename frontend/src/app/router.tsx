@@ -7,7 +7,9 @@ import { ProtectedRoute } from "@/components/common/protected-route";
 import { LoginPage } from "@/features/auth/pages/login-page";
 import { RegisterPage } from "@/features/auth/pages/register-page";
 import { DoctorDashboardPage } from "@/features/doctor/doctor-dashboard-page";
-import { PatientDashboardPage } from "@/features/patient/patient-dashboard-page";
+import { PatientDashboardPage } from "@/features/patient/pages/patient-dashboard-page";
+import { PatientProfilePage } from "@/features/patient/pages/patient-profile-page";
+import { PatientRecordsPage } from "@/features/patient/pages/patient-records-page";
 import { LandingPage } from "@/pages/landing-page";
 import { NotFoundPage } from "@/pages/not-found-page";
 
@@ -28,7 +30,11 @@ export const router = createBrowserRouter([
     children: [
       {
         element: <DashboardLayout />,
-        children: [{ path: "/patient/dashboard", element: <PatientDashboardPage /> }],
+        children: [
+          { path: "/patient/dashboard", element: <PatientDashboardPage /> },
+          { path: "/patient/profile", element: <PatientProfilePage /> },
+          { path: "/patient/records", element: <PatientRecordsPage /> },
+        ],
       },
     ],
   },

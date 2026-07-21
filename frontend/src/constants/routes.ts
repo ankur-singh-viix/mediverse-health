@@ -10,6 +10,8 @@ export const ROUTES = {
   LOGIN: "/login",
   REGISTER: "/register",
   PATIENT_DASHBOARD: "/patient/dashboard",
+  PATIENT_PROFILE: "/patient/profile",
+  PATIENT_RECORDS: "/patient/records",
   DOCTOR_DASHBOARD: "/doctor/dashboard",
   NOT_FOUND: "*",
 } as const;
