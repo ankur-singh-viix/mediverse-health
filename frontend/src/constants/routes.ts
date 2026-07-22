@@ -13,5 +13,6 @@ export const ROUTES = {
   PATIENT_PROFILE: "/patient/profile",
   PATIENT_RECORDS: "/patient/records",
   DOCTOR_DASHBOARD: "/doctor/dashboard",
+  DOCTOR_PATIENT_DETAIL: "/doctor/patients/:patientId",
   NOT_FOUND: "*",
 } as const;

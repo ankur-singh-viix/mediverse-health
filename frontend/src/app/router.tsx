@@ -6,7 +6,8 @@ import { PublicLayout } from "@/components/layout/public-layout";
 import { ProtectedRoute } from "@/components/common/protected-route";
 import { LoginPage } from "@/features/auth/pages/login-page";
 import { RegisterPage } from "@/features/auth/pages/register-page";
-import { DoctorDashboardPage } from "@/features/doctor/doctor-dashboard-page";
+import { DoctorDashboardPage } from "@/features/doctor/pages/doctor-dashboard-page";
+import { DoctorPatientDetailPage } from "@/features/doctor/pages/doctor-patient-detail-page";
 import { PatientDashboardPage } from "@/features/patient/pages/patient-dashboard-page";
 import { PatientProfilePage } from "@/features/patient/pages/patient-profile-page";
 import { PatientRecordsPage } from "@/features/patient/pages/patient-records-page";
@@ -43,7 +44,10 @@ export const router = createBrowserRouter([
     children: [
       {
         element: <DashboardLayout />,
-        children: [{ path: "/doctor/dashboard", element: <DoctorDashboardPage /> }],
+        children: [
+          { path: "/doctor/dashboard", element: <DoctorDashboardPage /> },
+          { path: "/doctor/patients/:patientId", element: <DoctorPatientDetailPage /> },
+        ],
       },
     ],
   },
