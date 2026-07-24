@@ -87,6 +87,9 @@ export function PatientDashboardPage() {
           <Button variant="outline" asChild>
             <Link to={ROUTES.PATIENT_RECORDS}>View medical records</Link>
           </Button>
+          <Button variant="outline" asChild>
+            <Link to={ROUTES.PATIENT_SYMPTOM_CHECKER}>Run AI symptom checker</Link>
+          </Button>
         </CardContent>
       </Card>
     </div>

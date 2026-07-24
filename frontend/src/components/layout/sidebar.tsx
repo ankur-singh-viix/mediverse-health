@@ -1,4 +1,4 @@
-import { FileText, IdCard, LayoutDashboard, Users } from "lucide-react";
+import { FileText, IdCard, LayoutDashboard, Sparkles, Users } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ const patientNavItems = [
   { label: "Dashboard", icon: LayoutDashboard, to: ROUTES.PATIENT_DASHBOARD },
   { label: "My Profile", icon: IdCard, to: ROUTES.PATIENT_PROFILE },
   { label: "Medical Records", icon: FileText, to: ROUTES.PATIENT_RECORDS },
+  { label: "Symptom Checker", icon: Sparkles, to: ROUTES.PATIENT_SYMPTOM_CHECKER },
 ];
 
 const doctorNavItems = [{ label: "Patients", icon: Users, to: ROUTES.DOCTOR_DASHBOARD }];
