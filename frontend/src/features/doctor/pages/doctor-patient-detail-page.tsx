@@ -1,18 +1,39 @@
-import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, FileText } from "lucide-react";
+import * as React from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, FileText, NotebookPen, Sparkles } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import { ErrorState } from "@/components/common/error-state";
+import { LoadingSpinner } from "@/components/common/loading-spinner";
 import { PageLoader } from "@/components/common/page-loader";
-import { fetchPatientDetail } from "@/features/doctor/api/doctor.api";
+import { addPatientNote, fetchPatientDetail } from "@/features/doctor/api/doctor.api";
+import { mapApiNoteToNote } from "@/features/doctor/utils/map-doctor";
+import { mapApiPredictionToPrediction } from "@/features/ai/utils/map-ai";
+import type { RiskLevel } from "@/features/ai/types/ai.types";
 import { mapApiRecordToRecord } from "@/features/patient/utils/map-patient";
+import { getApiErrorMessage } from "@/lib/api-error";
 
 const fieldLabel = "text-xs font-medium uppercase tracking-wide text-muted-foreground";
 
+const riskBadgeVariant: Record<RiskLevel, "success" | "secondary" | "destructive"> = {
+  low: "success",
+  medium: "secondary",
+  high: "destructive",
+};
+
+function capitalize(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 export function DoctorPatientDetailPage() {
   const { patientId } = useParams<{ patientId: string }>();
+  const queryClient = useQueryClient();
+  const [noteText, setNoteText] = React.useState("");
+  const [noteError, setNoteError] = React.useState<string | null>(null);
 
   const {
     data,
@@ -25,6 +46,25 @@ export function DoctorPatientDetailPage() {
     enabled: Boolean(patientId),
   });
 
+  const addNoteMutation = useMutation({
+    mutationFn: (note: string) => addPatientNote(patientId as string, note),
+    onSuccess: () => {
+      setNoteText("");
+      setNoteError(null);
+      queryClient.invalidateQueries({ queryKey: ["doctor-patient-detail", patientId] });
+    },
+    onError: (error) => setNoteError(getApiErrorMessage(error, "Unable to add this note.")),
+  });
+
+  const handleAddNote = () => {
+    if (noteText.trim().length < 2) {
+      setNoteError("Note must be at least 2 characters.");
+      return;
+    }
+    setNoteError(null);
+    addNoteMutation.mutate(noteText.trim());
+  };
+
   if (isLoading) {
     return <PageLoader message="Loading patient record..." />;
   }
@@ -35,6 +75,8 @@ export function DoctorPatientDetailPage() {
 
   const { user, profile } = data;
   const records = data.records.map(mapApiRecordToRecord);
+  const predictions = data.predictions.map(mapApiPredictionToPrediction);
+  const notes = data.notes.map(mapApiNoteToNote);
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -114,6 +156,95 @@ export function DoctorPatientDetailPage() {
               )}
             </div>
           ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            AI symptom-check history
+          </CardTitle>
+          <CardDescription>
+            {predictions.length} check{predictions.length === 1 ? "" : "s"} logged by the patient.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {predictions.length === 0 && (
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              This patient hasn't run a symptom check yet.
+            </p>
+          )}
+          {predictions.map((prediction) => (
+            <div key={prediction.id} className="rounded-lg border border-border p-4">
+              <div className="flex items-center justify-between">
+                <p className="font-medium">{prediction.predictedCondition}</p>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">
+                    {Math.round(prediction.confidence * 100)}% confidence
+                  </Badge>
+                  <Badge variant={riskBadgeVariant[prediction.riskLevel]}>
+                    {capitalize(prediction.riskLevel)}
+                  </Badge>
+                </div>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Reported: {prediction.symptoms}
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">{prediction.advice}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <NotebookPen className="h-4 w-4 text-primary" />
+            Clinical notes
+          </CardTitle>
+          <CardDescription>Notes you and other doctors have added for this patient.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {noteError && (
+            <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {noteError}
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Textarea
+              placeholder="Add a clinical note about this patient..."
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
+            />
+            <Button onClick={handleAddNote} disabled={addNoteMutation.isPending}>
+              {addNoteMutation.isPending ? (
+                <LoadingSpinner size={16} className="text-primary-foreground" />
+              ) : (
+                "Add note"
+              )}
+            </Button>
+          </div>
+
+          <div className="space-y-3">
+            {notes.length === 0 && (
+              <p className="py-4 text-center text-sm text-muted-foreground">
+                No clinical notes yet.
+              </p>
+            )}
+            {notes.map((note) => (
+              <div key={note.id} className="rounded-lg border border-border p-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium">{note.doctorFullName}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(note.createdAt).toLocaleString()}
+                  </p>
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">{note.note}</p>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>

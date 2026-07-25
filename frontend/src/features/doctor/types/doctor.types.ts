@@ -9,6 +9,7 @@ import type {
   MedicalRecordApiResponse,
   PatientProfileApiResponse,
 } from "@/features/patient/types/patient.types";
+import type { PredictionApiResponse } from "@/features/ai/types/ai.types";
 
 export interface PatientSummaryApiResponse {
   id: string;
@@ -37,8 +38,26 @@ export interface PatientUserApiResponse {
   updated_at: string;
 }
 
+export interface DoctorNoteApiResponse {
+  id: string;
+  doctor_id: string;
+  doctor_full_name: string;
+  note: string;
+  created_at: string;
+}
+
+export interface DoctorNote {
+  id: string;
+  doctorId: string;
+  doctorFullName: string;
+  note: string;
+  createdAt: string;
+}
+
 export interface PatientDetailApiResponse {
   user: PatientUserApiResponse;
   profile: PatientProfileApiResponse;
   records: MedicalRecordApiResponse[];
+  predictions: PredictionApiResponse[];
+  notes: DoctorNoteApiResponse[];
 }

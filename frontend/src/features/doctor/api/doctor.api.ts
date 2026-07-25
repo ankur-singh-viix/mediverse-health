@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/axios";
 import type {
+  DoctorNoteApiResponse,
   PatientDetailApiResponse,
   PatientSummaryApiResponse,
 } from "@/features/doctor/types/doctor.types";
@@ -12,6 +13,17 @@ export async function fetchPatients(): Promise<PatientSummaryApiResponse[]> {
 export async function fetchPatientDetail(patientId: string): Promise<PatientDetailApiResponse> {
   const { data } = await apiClient.get<PatientDetailApiResponse>(
     `/doctors/patients/${patientId}`
+  );
+  return data;
+}
+
+export async function addPatientNote(
+  patientId: string,
+  note: string
+): Promise<DoctorNoteApiResponse> {
+  const { data } = await apiClient.post<DoctorNoteApiResponse>(
+    `/doctors/patients/${patientId}/notes`,
+    { note }
   );
   return data;
 }
