@@ -1,4 +1,4 @@
-import { FileText, IdCard, LayoutDashboard, Sparkles, Users } from "lucide-react";
+import { Calendar, FileText, IdCard, LayoutDashboard, Sparkles, Users } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 import { cn } from "@/lib/utils";
@@ -14,9 +14,13 @@ const patientNavItems = [
   { label: "My Profile", icon: IdCard, to: ROUTES.PATIENT_PROFILE },
   { label: "Medical Records", icon: FileText, to: ROUTES.PATIENT_RECORDS },
   { label: "Symptom Checker", icon: Sparkles, to: ROUTES.PATIENT_SYMPTOM_CHECKER },
+  { label: "Appointments", icon: Calendar, to: ROUTES.PATIENT_APPOINTMENTS },
 ];
 
-const doctorNavItems = [{ label: "Patients", icon: Users, to: ROUTES.DOCTOR_DASHBOARD }];
+const doctorNavItems = [
+  { label: "Patients", icon: Users, to: ROUTES.DOCTOR_DASHBOARD },
+  { label: "Appointments", icon: Calendar, to: ROUTES.DOCTOR_APPOINTMENTS },
+];
 
 export function Sidebar({ open }: SidebarProps) {
   const { user } = useAuth();

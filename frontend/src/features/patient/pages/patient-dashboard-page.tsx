@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageLoader } from "@/components/common/page-loader";
+import { fetchMyAppointments } from "@/features/appointments/api/appointment.api";
 import { fetchMyProfile, fetchMyRecords } from "@/features/patient/api/patient.api";
 import { mapApiProfileToProfile, mapApiRecordToRecord } from "@/features/patient/utils/map-patient";
 import { ROUTES } from "@/constants/routes";
@@ -23,11 +24,19 @@ export function PatientDashboardPage() {
     queryFn: async () => (await fetchMyRecords()).map(mapApiRecordToRecord),
   });
 
-  if (profileLoading || recordsLoading) {
+  const { data: appointments, isLoading: appointmentsLoading } = useQuery({
+    queryKey: ["my-appointments"],
+    queryFn: fetchMyAppointments,
+  });
+
+  if (profileLoading || recordsLoading || appointmentsLoading) {
     return <PageLoader message="Loading your dashboard..." />;
   }
 
   const profileComplete = Boolean(profile?.phoneNumber && profile?.dateOfBirth);
+  const upcomingCount = appointments?.filter(
+    (a) => a.status === "pending" || a.status === "confirmed"
+  ).length ?? 0;
 
   return (
     <div className="space-y-6">
@@ -69,8 +78,8 @@ export function PatientDashboardPage() {
             <CalendarClock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">—</div>
-            <p className="text-xs text-muted-foreground">Coming in a future phase.</p>
+            <div className="text-2xl font-bold">{upcomingCount}</div>
+            <p className="text-xs text-muted-foreground">Pending or confirmed.</p>
           </CardContent>
         </Card>
       </div>
@@ -89,6 +98,9 @@ export function PatientDashboardPage() {
           </Button>
           <Button variant="outline" asChild>
             <Link to={ROUTES.PATIENT_SYMPTOM_CHECKER}>Run AI symptom checker</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to={ROUTES.PATIENT_APPOINTMENTS}>Book an appointment</Link>
           </Button>
         </CardContent>
       </Card>

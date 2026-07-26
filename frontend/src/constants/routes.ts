@@ -13,7 +13,9 @@ export const ROUTES = {
   PATIENT_PROFILE: "/patient/profile",
   PATIENT_RECORDS: "/patient/records",
   PATIENT_SYMPTOM_CHECKER: "/patient/symptom-checker",
+  PATIENT_APPOINTMENTS: "/patient/appointments",
   DOCTOR_DASHBOARD: "/doctor/dashboard",
   DOCTOR_PATIENT_DETAIL: "/doctor/patients/:patientId",
+  DOCTOR_APPOINTMENTS: "/doctor/appointments",
   NOT_FOUND: "*",
 } as const;

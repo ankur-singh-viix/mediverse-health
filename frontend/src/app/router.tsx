@@ -7,6 +7,8 @@ import { ProtectedRoute } from "@/components/common/protected-route";
 import { LoginPage } from "@/features/auth/pages/login-page";
 import { RegisterPage } from "@/features/auth/pages/register-page";
 import { SymptomCheckerPage } from "@/features/ai/pages/symptom-checker-page";
+import { DoctorAppointmentsPage } from "@/features/appointments/pages/doctor-appointments-page";
+import { PatientAppointmentsPage } from "@/features/appointments/pages/patient-appointments-page";
 import { DoctorDashboardPage } from "@/features/doctor/pages/doctor-dashboard-page";
 import { DoctorPatientDetailPage } from "@/features/doctor/pages/doctor-patient-detail-page";
 import { PatientDashboardPage } from "@/features/patient/pages/patient-dashboard-page";
@@ -37,6 +39,7 @@ export const router = createBrowserRouter([
           { path: "/patient/profile", element: <PatientProfilePage /> },
           { path: "/patient/records", element: <PatientRecordsPage /> },
           { path: "/patient/symptom-checker", element: <SymptomCheckerPage /> },
+          { path: "/patient/appointments", element: <PatientAppointmentsPage /> },
         ],
       },
     ],
@@ -49,6 +52,7 @@ export const router = createBrowserRouter([
         children: [
           { path: "/doctor/dashboard", element: <DoctorDashboardPage /> },
           { path: "/doctor/patients/:patientId", element: <DoctorPatientDetailPage /> },
+          { path: "/doctor/appointments", element: <DoctorAppointmentsPage /> },
         ],
       },
     ],

@@ -8,7 +8,7 @@ will register their routers in this file without touching `app.main`.
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, doctors, health, patients, predictions
+from app.api.v1.endpoints import appointments, auth, doctors, health, patients, predictions
 
 api_router = APIRouter()
 
@@ -17,3 +17,4 @@ api_router.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 api_router.include_router(patients.router, prefix="/patients", tags=["Patient"])
 api_router.include_router(doctors.router, prefix="/doctors", tags=["Doctor"])
 api_router.include_router(predictions.router, prefix="/predictions", tags=["AI Predictions"])
+api_router.include_router(appointments.router, prefix="/appointments", tags=["Appointments"])
