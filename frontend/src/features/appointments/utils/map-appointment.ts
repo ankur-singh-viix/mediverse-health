@@ -23,6 +23,7 @@ export function mapApiAppointmentToAppointment(api: AppointmentApiResponse): App
     requestedAt: api.requested_at,
     reason: api.reason,
     status: api.status,
+    note: api.note,
     createdAt: api.created_at,
   };
 }

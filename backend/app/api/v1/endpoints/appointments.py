@@ -64,15 +64,15 @@ def list_my_appointments(
 
 @router.patch(
     "/{appointment_id}/cancel",
-    response_model=AppointmentResponse,
-    summary="Cancel my own pending appointment (patient)",
+    status_code=204,
+    summary="Cancel my own pending appointment (patient) - permanently removes it",
 )
 def cancel_appointment(
     appointment_id: uuid.UUID,
     current_user: User = Depends(require_role(UserRole.PATIENT)),
     db: Session = Depends(get_db),
-) -> AppointmentResponse:
-    return AppointmentService(db).cancel_appointment(current_user.id, appointment_id)
+) -> None:
+    AppointmentService(db).cancel_appointment(current_user.id, appointment_id)
 
 
 @router.get(
@@ -99,5 +99,5 @@ def respond_to_appointment(
     db: Session = Depends(get_db),
 ) -> AppointmentResponse:
     return AppointmentService(db).respond_to_appointment(
-        current_user.id, appointment_id, payload.status
+        current_user.id, appointment_id, payload.status, payload.note
     )

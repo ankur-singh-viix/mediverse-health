@@ -28,6 +28,7 @@ export interface AppointmentApiResponse {
   requested_at: string;
   reason: string | null;
   status: AppointmentStatus;
+  note: string | null;
   created_at: string;
 }
 
@@ -40,6 +41,7 @@ export interface Appointment {
   requestedAt: string;
   reason: string | null;
   status: AppointmentStatus;
+  note: string | null;
   createdAt: string;
 }
 

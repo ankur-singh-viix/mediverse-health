@@ -44,6 +44,7 @@ class AppointmentService:
             requested_at=appointment.requested_at,
             reason=appointment.reason,
             status=appointment.status,
+            note=appointment.note,
             created_at=appointment.created_at,
         )
 
@@ -74,7 +75,11 @@ class AppointmentService:
         return [self._build_response(a) for a in appointments]
 
     def respond_to_appointment(
-        self, doctor_id: uuid.UUID, appointment_id: uuid.UUID, new_status: str
+        self,
+        doctor_id: uuid.UUID,
+        appointment_id: uuid.UUID,
+        new_status: str,
+        note: str | None = None,
     ) -> AppointmentResponse:
         """A doctor accepts or declines one of their own pending appointments."""
         appointment = self.appointment_repository.get_by_id(appointment_id)
@@ -82,21 +87,27 @@ class AppointmentService:
             raise NotFoundException("Appointment not found.")
         if appointment.status != AppointmentStatus.PENDING:
             raise BadRequestException("Only pending appointments can be responded to.")
+        if new_status == "declined" and not (note and note.strip()):
+            raise BadRequestException("A reason is required when declining an appointment.")
 
         appointment.status = AppointmentStatus(new_status)
+        appointment.note = note
         appointment = self.appointment_repository.update(appointment)
         return self._build_response(appointment)
 
-    def cancel_appointment(
-        self, patient_id: uuid.UUID, appointment_id: uuid.UUID
-    ) -> AppointmentResponse:
-        """A patient cancels one of their own pending appointments."""
+    def cancel_appointment(self, patient_id: uuid.UUID, appointment_id: uuid.UUID) -> None:
+        """
+        A patient cancels one of their own pending appointments.
+
+        Cancelling a pending request removes it entirely rather than
+        marking it "cancelled" - the doctor never acted on it, so
+        there's nothing worth keeping a record of, and it shouldn't
+        linger in either party's list.
+        """
         appointment = self.appointment_repository.get_by_id(appointment_id)
         if appointment is None or appointment.patient_id != patient_id:
             raise NotFoundException("Appointment not found.")
         if appointment.status != AppointmentStatus.PENDING:
             raise BadRequestException("Only pending appointments can be cancelled.")
 
-        appointment.status = AppointmentStatus.CANCELLED
-        appointment = self.appointment_repository.update(appointment)
-        return self._build_response(appointment)
+        self.appointment_repository.delete(appointment)

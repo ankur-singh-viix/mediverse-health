@@ -36,6 +36,7 @@ class AppointmentRespondRequest(BaseModel):
     """Payload for a doctor accepting or declining a pending appointment."""
 
     status: Literal["confirmed", "declined"]
+    note: str | None = Field(default=None, max_length=1000)
 
 
 class AppointmentResponse(BaseModel):
@@ -49,4 +50,5 @@ class AppointmentResponse(BaseModel):
     requested_at: datetime
     reason: str | None
     status: AppointmentStatus
+    note: str | None
     created_at: datetime

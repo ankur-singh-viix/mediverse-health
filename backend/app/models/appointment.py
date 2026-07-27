@@ -45,6 +45,7 @@ class Appointment(BaseModelMixin, Base):
         nullable=False,
         default=AppointmentStatus.PENDING,
     )
+    note: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     def __repr__(self) -> str:  # pragma: no cover
         return f"<Appointment id={self.id} patient_id={self.patient_id} doctor_id={self.doctor_id} status={self.status}>"

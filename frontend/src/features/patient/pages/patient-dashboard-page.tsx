@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageLoader } from "@/components/common/page-loader";
 import { fetchMyAppointments } from "@/features/appointments/api/appointment.api";
+import { mapApiAppointmentToAppointment } from "@/features/appointments/utils/map-appointment";
 import { fetchMyProfile, fetchMyRecords } from "@/features/patient/api/patient.api";
 import { mapApiProfileToProfile, mapApiRecordToRecord } from "@/features/patient/utils/map-patient";
 import { ROUTES } from "@/constants/routes";
@@ -26,7 +27,7 @@ export function PatientDashboardPage() {
 
   const { data: appointments, isLoading: appointmentsLoading } = useQuery({
     queryKey: ["my-appointments"],
-    queryFn: fetchMyAppointments,
+    queryFn: async () => (await fetchMyAppointments()).map(mapApiAppointmentToAppointment),
   });
 
   if (profileLoading || recordsLoading || appointmentsLoading) {

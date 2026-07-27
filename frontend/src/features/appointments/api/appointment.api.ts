@@ -26,11 +26,8 @@ export async function fetchMyAppointments(): Promise<AppointmentApiResponse[]> {
   return data;
 }
 
-export async function cancelAppointment(appointmentId: string): Promise<AppointmentApiResponse> {
-  const { data } = await apiClient.patch<AppointmentApiResponse>(
-    `/appointments/${appointmentId}/cancel`
-  );
-  return data;
+export async function cancelAppointment(appointmentId: string): Promise<void> {
+  await apiClient.patch(`/appointments/${appointmentId}/cancel`);
 }
 
 export async function fetchDoctorAppointments(): Promise<AppointmentApiResponse[]> {
@@ -40,11 +37,12 @@ export async function fetchDoctorAppointments(): Promise<AppointmentApiResponse[
 
 export async function respondToAppointment(
   appointmentId: string,
-  status: "confirmed" | "declined"
+  status: "confirmed" | "declined",
+  note?: string
 ): Promise<AppointmentApiResponse> {
   const { data } = await apiClient.patch<AppointmentApiResponse>(
     `/appointments/${appointmentId}/respond`,
-    { status }
+    { status, note: note || undefined }
   );
   return data;
 }
